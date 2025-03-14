@@ -1,1 +1,4 @@
 config.json
+tdlib/
+tgclient/__pycache__
+libtdjson.so*

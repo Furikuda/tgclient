@@ -61,7 +61,7 @@ class TelegramClient:
             if os.name == 'nt':
                 tdjson_path = os.path.join(os.path.dirname(__file__), 'tdjson.dll')
             else:
-                raise TelegramError("Can't find 'tdjson' library")
+                raise TelegramError("Can't find 'tdjson' library. Run td_install.sh")
         tdjson = ctypes.CDLL(tdjson_path)
 
         # load TDLib functions from shared library
@@ -169,6 +169,6 @@ class TelegramClient:
 
 if __name__ == "__main__":
     with open("config.json", 'r') as f:
-        conf = json.load(f.read())
+        conf = json.load(f)
         t = TelegramClient(conf['api_id'], conf['api_hash'])
         t.main_loop()
