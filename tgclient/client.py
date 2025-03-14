@@ -3,10 +3,6 @@ from ctypes.util import find_library
 import json
 import os
 
-
-from queue import Queue
-
-
 class TelegramError(Exception):
     pass
 
@@ -104,6 +100,18 @@ class TelegramClient:
         j = json.dumps(event)
         self.log_str(j)
 
+    def send_tdlib_parameters(self):
+        self.td_send({'@type': 'setTdlibParameters',
+                 'database_directory': self.tdlib_database_directory,
+                 'use_message_database': True,
+                 'use_secret_chats': True,
+                 'api_id': self.api_id,
+                 'api_hash': self.api_hash,
+                 'system_language_code': 'en',
+                 'device_model': 'Desktop',
+                 'application_version': '1.0'})
+
+
     def handle_event(self, event):
         if event['@type'] == 'updateUser':
             uid = event['user']['id']
@@ -172,8 +180,6 @@ class TelegramClient:
         if not handle_event:
             handle_event = self.handle_event
         while True:
-            self.log_str('TG CLient started')
-
             event = self.td_receive()
             if event:
                 self.log(event)
