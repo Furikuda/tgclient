@@ -89,6 +89,10 @@ class Main(App):
         tgworker.start()
         self.processes.append(tgworker)
 
+    def cleanup(self):
+        print('Killing all processes to exit')
+        for p in self.processes:
+            p.terminate()
 
 
 if __name__ == "__main__":
@@ -97,3 +101,4 @@ if __name__ == "__main__":
 
         m = Main(conf['api_id'], conf['api_hash'])
         m.run()
+        m.cleanup()
