@@ -24,13 +24,14 @@ class TelegramClient:
         self._init_tdlib()
 
         self._init_client()
+        self.log_str('TG Client init')
 
     def _init_client(self):
         self.td_execute({'@type': 'setLogVerbosityLevel', 'new_verbosity_level': 1, '@extra': 1.01234})
         # create client
         self.client_id = self._td_create_client_id()
         # another test for TDLib execute method
-        print(str(self.td_execute({'@type': 'getTextEntities', 'text': '@telegram /test_command https://telegram.org telegram.me', '@extra': ['5', 7.0, 'a']})).encode('utf-8'))
+#        print(str(self.td_execute({'@type': 'getTextEntities', 'text': '@telegram /test_command https://telegram.org telegram.me', '@extra': ['5', 7.0, 'a']})).encode('utf-8'))
 
         # start the client by sending a request to it
         self.td_send({'@type': 'getOption', 'name': 'version', '@extra': 1.01234})
@@ -39,6 +40,7 @@ class TelegramClient:
     # simple wrappers for client usage
     def td_send(self, query):
         query = json.dumps(query).encode('utf-8')
+        self.log_str(f'Executed {query}')
         self._td_send(self.client_id, query)
 
     def td_receive(self):
@@ -49,6 +51,7 @@ class TelegramClient:
 
     def td_execute(self, query):
         query = json.dumps(query).encode('utf-8')
+        self.log_str(f'Executed {query}')
         result = self._td_execute(query)
         if result:
             result = json.loads(result.decode('utf-8'))
@@ -89,10 +92,17 @@ class TelegramClient:
 
 #        _td_set_log_message_callback(2, on_log_message_callback)
 
-    def log(self, event):
-        j = json.dumps(event).encode('utf-8')
-        self.log_file.write(j+b"\n")
+    def log_str(self, s):
+        self.log_bytes(s.encode('utf-8'))
+
+
+    def log_bytes(self, b):
+        self.log_file.write(b+b"\n")
         self.log_file.flush()
+
+    def log(self, event):
+        j = json.dumps(event)
+        self.log_str(j)
 
     def handle_event(self, event):
         if event['@type'] == 'updateUser':
@@ -162,10 +172,12 @@ class TelegramClient:
         if not handle_event:
             handle_event = self.handle_event
         while True:
+            self.log_str('TG CLient started')
+
             event = self.td_receive()
             if event:
+                self.log(event)
                 handle_event(event)
-#                self.log(event)
 
 if __name__ == "__main__":
     with open("config.json", 'r') as f:

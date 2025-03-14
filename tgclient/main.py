@@ -56,8 +56,8 @@ class Main(App):
             yield RichLog(id="telegram-client", auto_scroll=True)
         yield Footer()
 
-    async def _ask_question_str(self, s):
-        return await self.push_screen_wait(PopUp(s))
+    def _ask_question_str(self, s):
+        return self.push_screen_wait(PopUp(s))
 
 #    @on(LogMessage)
 #    def handle_event(self, event: LogMessage):
@@ -66,13 +66,12 @@ class Main(App):
 #        j = json.dumps(event.event).encode('utf-8')
 #        text_log.write(j)
 
-    async def _handle_tg_event(self, event):
-
-
-        phone_number = await self._ask_question_str('Please enter your phone number')
-#        text_log = self.query_one(RichLog)
-#        j = json.dumps(event).encode('utf-8')
-#        text_log.write(j)
+    def _handle_tg_event(self, event):
+        raise Exception('hoihoho')
+#        phone_number = self._ask_question_str('Please enter your phone number')
+        text_log = self.query_one(RichLog)
+        j = json.dumps(event).encode('utf-8')
+        text_log.write(j)
 #        if event['@type'] == 'updateAuthorizationState':
 #            auth_state = event['authorization_state']
 #            if auth_state['@type'] == 'authorizationStateWaitPhoneNumber':
@@ -83,15 +82,10 @@ class Main(App):
 #            self.tgclient.handle_event(event)
 
 
-    def _background_tgworker_start(self):
-        self.tgclient.main_loop(handle_event=self._handle_tg_event)
-
     def on_mount(self):
         self.tgclient = client.TelegramClient(self.api_id, self.api_hash)
 
-        tg_events_queue = Queue()
-
-        tgworker = Process(target=self.tgclient.main_loop, args=(tg_events_queue))
+        tgworker = Process(target=self.tgclient.main_loop, args=[self._handle_tg_event])
         tgworker.start()
         self.processes.append(tgworker)
 
