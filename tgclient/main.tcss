@@ -1,0 +1,10 @@
+Screen {
+    &:inline {
+        height: 50vh;
+    }
+}
+
+#telegram-logs {
+    height: 30%;
+    min-width: 100%;
+}
